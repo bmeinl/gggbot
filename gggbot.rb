@@ -8,7 +8,7 @@ module Bot
     Ident = 'InspectorGadget'
     Realname = 'Dr. Dr. I. Gadget'
     Perform = '##off-archlinux'
-    Admins = %w/ben_m brandeis/
+    Admins = %w(ben_m brandeis)
 
     def parse_msg(who, s)
         channel, message = s.scan(/(\S+) :(.+)/).first
