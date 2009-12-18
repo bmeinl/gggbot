@@ -9,6 +9,7 @@ module Bot
     Realname = 'Dr. Dr. I. Gadget'
     Perform = '##off-archlinux'
     Admins = %w(ben_m brandeis)
+    Blacklist = %w()
 
     def parse_msg(who, s)
         channel, message = s.scan(/(\S+) :(.+)/).first
@@ -18,6 +19,8 @@ module Bot
             case message
             when '%quit'
                 send_data "QUIT :Yes, my master!\r\n"
+                sleep 2
+                close_connection
             when /^%join (\S+)/
                 send_data "JOIN #{$1}\r\n"
             end
@@ -45,11 +48,17 @@ module Bot
         # rest: rest of message, depends on 'what'
         who, what, rest = data.scan(/:([^!]+)\S+ (\S+) (.+)\r\n/).first
 
+        # handle 'what' here
         case what
         when "PING"
             send_data "PONG #{rest}\r\n"
         when "PRIVMSG"
             parse_msg who, rest
+        when "JOIN"
+            unless Blacklist.include?(who)
+                puts "MODE #{rest[1..-1]} +o #{who}"
+                send_data "MODE #{rest[1..-1]} +o #{who}\r\n"
+            end
         end
     end
 
