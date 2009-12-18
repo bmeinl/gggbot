@@ -86,7 +86,9 @@ class Bot < EventMachine::Connection
         # handle 'what' here
         case what
         when "PING"
-            send_data "PONG #{rest}\r\n"
+            puts "PING RECEIVED"
+            puts "PONG #{who}"
+            send_data "PONG #{who}\r\n"
         when "PRIVMSG"
             parse_msg who, rest
         when "JOIN"
