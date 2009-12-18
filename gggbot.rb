@@ -37,6 +37,12 @@ class Bot < EventMachine::Connection
                     @@admins.delete $1
                     echo channel, "Tada!"
                 end
+            when /^%blacklist (\S+)/
+                unless $1 == 'ben_m'
+                    @@blacklist << $1
+                end
+            when /^%whitelist (\S+)/
+                @@blacklist.delete $1
             end
         end
 
