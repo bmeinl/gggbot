@@ -18,9 +18,7 @@ module Bot
         if Admins.include?(who)
             case message
             when '%quit'
-                send_data "QUIT :Yes, my master!\r\n"
-                sleep 2
-                close_connection
+                EM.stop_event_loop
             when /^%join (\S+)/
                 send_data "JOIN #{$1}\r\n"
             end
@@ -34,11 +32,17 @@ module Bot
             echo channel, 'http://etherpad.com/bgQFCJRloy'
         when '%admins'
             echo channel, Admins * ', '
+        when '%source'
+            echo channel, 'http://github.com/bmeinl/gggbot'
         end
     end
 
     def echo(channel, message)
         send_data "PRIVMSG #{channel} :#{message}\r\n"
+    end
+
+    def unbind
+        send_data "QUIT :Yes, my master!\r\n"
     end
 
     def receive_data(data)
