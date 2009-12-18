@@ -56,6 +56,8 @@ class Bot < EventMachine::Connection
             echo channel, @@admins * ', '
         when '%source'
             echo channel, 'http://github.com/bmeinl/gggbot'
+        when '%ping'
+            echo channel, ['Donkey Kong.', 'Pongidong.', 'Woosh', 'I pooped :('][rand 4]
         end
     end
 
