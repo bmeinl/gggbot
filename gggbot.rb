@@ -9,7 +9,7 @@ class Bot < EventMachine::Connection
     @@Realname = 'Dr. Dr. I. Gadget'
     @@Perform = '##off-archlinux'
     @@admins = %w(ben_m brandeis)
-    @@blacklist = %w()
+    @@blacklist = []
 
     def initialize(*args)
         super
@@ -29,6 +29,8 @@ class Bot < EventMachine::Connection
                 EventMachine::stop_event_loop
             when /^%join (\S+)/
                 send_data "JOIN #{$1}\r\n"
+            when /^%part/
+                send_data "PART #{channel}\r\n"
             when /^%add (\S+)/
                 @@admins << $1
                 echo channel, "Tada!"
@@ -58,6 +60,11 @@ class Bot < EventMachine::Connection
             echo channel, 'http://github.com/bmeinl/gggbot'
         when '%ping'
             echo channel, ['Donkey Kong.', 'Pongidong.', 'Woosh', 'I pooped :('][rand 4]
+        when '%help'
+            echo channel, 'This bot is pretty much useless at the moment.'
+        when '%commands'
+            echo channel, 'version, wishlist, admins, source, ping, help, commands'
+            echo channel, 'admins only: quit, join, part, add, remove, blacklist, whitelist'
         end
     end
 
