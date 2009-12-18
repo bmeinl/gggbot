@@ -1,26 +1,42 @@
 require 'eventmachine'
 
-module Bot
-    Nick = 'InspectorGadget'
+class Bot < EventMachine::Connection
+    @@Nick = 'InspectorGadget'
     # just so I don't forget to remove the password when
     #+I'm uploading this file somewhere ...
-    Password = IO.read('password')
-    Ident = 'InspectorGadget'
-    Realname = 'Dr. Dr. I. Gadget'
-    Perform = '##off-archlinux'
-    Admins = %w(ben_m brandeis)
-    Blacklist = %w()
+    @@Password = IO.read('password')
+    @@Ident = 'InspectorGadget'
+    @@Realname = 'Dr. Dr. I. Gadget'
+    @@Perform = '##off-archlinux'
+    @@admins = %w(ben_m brandeis)
+    @@blacklist = %w()
+
+    def initialize(*args)
+        super
+        send_data "NICK #{@@Nick}\r\n"
+        send_data "USER #{@@Ident} bla bla :#{@@Realname}\r\n"
+        send_data "PRIVMSG NickServ :identify ben_m #{@@Password}\r\n"
+        send_data "JOIN #{@@Perform}\r\n"
+    end
 
     def parse_msg(who, s)
         channel, message = s.scan(/(\S+) :(.+)/).first
 
         # admin only commands go here
-        if Admins.include?(who)
+        if @@admins.include?(who)
             case message
             when '%quit'
-                EM.stop_event_loop
+                EventMachine::stop_event_loop
             when /^%join (\S+)/
                 send_data "JOIN #{$1}\r\n"
+            when /^%add (\S+)/
+                @@admins << $1
+                echo channel, "Tada!"
+            when /^%remove (\S+)/
+                unless $1 == 'ben_m'
+                    @@admins.delete $1
+                    echo channel, "Tada!"
+                end
             end
         end
 
@@ -31,7 +47,7 @@ module Bot
         when '%wishlist'
             echo channel, 'http://etherpad.com/bgQFCJRloy'
         when '%admins'
-            echo channel, Admins * ', '
+            echo channel, @@admins * ', '
         when '%source'
             echo channel, 'http://github.com/bmeinl/gggbot'
         end
@@ -59,21 +75,14 @@ module Bot
         when "PRIVMSG"
             parse_msg who, rest
         when "JOIN"
-            unless Blacklist.include?(who)
+            unless @@blacklist.include?(who)
                 puts "MODE #{rest[1..-1]} +o #{who}"
                 send_data "MODE #{rest[1..-1]} +o #{who}\r\n"
             end
         end
     end
-
-    def post_init
-        send_data "NICK #{Nick}\r\n"
-        send_data "USER #{Ident} bla bla :#{Realname}\r\n"
-        send_data "PRIVMSG NickServ :identify ben_m #{Password}\r\n"
-        send_data "JOIN #{Perform}\r\n"
-    end
 end
 
-EM.run do
-    EM.connect 'irc.freenode.org', 6667, Bot
+EventMachine::run do
+    EventMachine::connect 'irc.freenode.org', 6667, Bot
 end
