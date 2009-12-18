@@ -1,10 +1,12 @@
 require 'eventmachine'
 
+# STDERR = log
+
 class Bot < EventMachine::Connection
     @@Nick = 'InspectorGadget'
     # just so I don't forget to remove the password when
     #+I'm uploading this file somewhere ...
-    @@Password = IO.read('password')
+    @@Password = IO.read('.password')
     @@Ident = 'InspectorGadget'
     @@Realname = 'Dr. Dr. I. Gadget'
     @@Perform = '##off-archlinux'
@@ -86,9 +88,7 @@ class Bot < EventMachine::Connection
         # handle 'what' here
         case what
         when "PING"
-            puts "PING RECEIVED"
-            puts "PONG #{who}"
-            send_data "PONG #{who}\r\n"
+            send_data "PONG #{rest[1..-1]}\r\n"
         when "PRIVMSG"
             parse_msg who, rest
         when "JOIN"
