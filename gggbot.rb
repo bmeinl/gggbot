@@ -61,12 +61,15 @@ class Bot < EventMachine::Connection
         when '%source'
             echo channel, 'http://github.com/bmeinl/gggbot'
         when '%ping'
-            echo channel, ['Donkey Kong.', 'Pongidong.', 'Woosh', 'I pooped :('][rand 4]
+            echo channel, ['Donkey Kong.', 'Pongidong.', 'Woosh',
+                           'I pooped :('][rand 4]
         when '%help'
             echo channel, 'This bot is pretty much useless at the moment.'
         when '%commands'
-            echo channel, 'version, wishlist, admins, source, ping, help, commands'
-            echo channel, 'admins only: quit, join, part, add, remove, blacklist, whitelist'
+            echo channel, 'version, wishlist, admins, source, '
+                          'ping, help, commands'
+            echo channel, 'admins only: quit, join, part, add, remove, '
+                          'blacklist, whitelist'
         end
     end
 
@@ -88,7 +91,9 @@ class Bot < EventMachine::Connection
         # handle 'what' here
         case what
         when "PING"
-            send_data "PONG #{rest[1..-1]}\r\n"
+            puts "GOT PONG!!!!!!!!!!!"
+            puts "#{data}"
+            send_data "PONG #{rest}\r\n"
         when "PRIVMSG"
             parse_msg who, rest
         when "JOIN"
